@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="net.thumbtack.school.database.mybatis.mappers.SchoolMapper">
+
+
+    <resultMap type="net.thumbtack.school.database.model.School" id="resultSchool">
+
+        <id column="id" property="id"/>
+
+        <result column="name" property="name"/>
+
+        <result column="year" property="year"/>
+
+        <collection column="id" property="groups" ofType="net.thumbtack.school.database.model.Group"
+                    javaType="java.util.List">
+
+            <result column="g_id" property="id"/>
+
+            <result column="g_name" property="name"/>
+
+            <result column="room" property="room"/>
+
+            <collection column="g_id" property="trainees" ofType="net.thumbtack.school.database.model.Trainee"
+                        javaType="java.util.List">
+                <result column="t_id" property="id"/>
+
+                <result column="firstName" property="firstName"/>
+
+                <result column="lastName" property="lastName"/>
+
+                <result column="rating" property="rating"/>
+            </collection>
+
+            <collection column="g_id" property="subjects" ofType="net.thumbtack.school.database.model.Subject"
+                        javaType="java.util.List">
+
+                <result column="sub_id" property="id"/>
+
+                <result column="sub_name" property="name"/>
+
+            </collection>
+
+        </collection>
+
+    </resultMap>
+
+    <select id="getAllJoin" resultMap="resultSchool">SELECT school.id, school.name, year, group.id AS g_id, group.name AS g_name,
+        room, school_id , trainee.id AS t_id, firstName, lastName, rating, group_id, subject.id AS sub_id, subject.name AS sub_name FROM school
+        LEFT JOIN `group` ON school.id = group.school_id
+        LEFT JOIN trainee ON group.id = trainee.group_id
+        LEFT JOIN subject ON subject.id IN (SELECT id FROM subject WHERE id IN (SELECT subject_id FROM group_subject
+        WHERE group_id = group.id))
+    </select>
+
+</mapper>
